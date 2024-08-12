@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy
     steps:
-      - uses: actions/checkout@v4
-      - name: Deploy
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
