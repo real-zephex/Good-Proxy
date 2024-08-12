@@ -13,10 +13,6 @@ app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
-// app.options("/fetch", (c) => {
-//   return new Response(null, { headers: corsHeaders, status: 204 });
-// });
-
 app.get("/fetch", async (c) => {
   const data = await RequestHandler({ response: c.req });
   return data;
