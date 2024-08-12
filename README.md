@@ -1,2 +1,8 @@
-# Good-Proxy
-A simple proxy to bypass cors. 
+```
+npm install
+npm run dev
+```
+
+```
+npm run deploy
+```
