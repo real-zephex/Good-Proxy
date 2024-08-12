@@ -5,6 +5,7 @@
     "deploy": "wrangler deploy --minify src/index.ts"
   },
   "dependencies": {
+    "@types/node": "^22.2.0",
     "hono": "^4.5.5"
   },
   "devDependencies": {

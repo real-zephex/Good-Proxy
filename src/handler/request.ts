@@ -12,17 +12,22 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
     const { url, ref } = response.query();
     const userHeaders = response.header();
 
+    const urlified = new URL(url);
+    console.log(url);
+
     // fetching content from the remote server using the headers provided by the user
-    const fetchedRespone = await fetch(url, {
+    const fetchedResponse = await fetch(url, {
       headers: { ...userHeaders, ...corsHeaders, Referer: ref ? ref : "" },
     }); // making request
 
-    const type = fetchedRespone.headers.get("Content-Type") || "text/plain"; // detecting type of the response
-    let responseBody;
+    const type = fetchedResponse.headers.get("Content-Type") || "text/plain"; // detecting type of the response
+    let responseBody: BodyInit | null = fetchedResponse.body;
+    console.log(type);
+
     // THIS LITERALLY TOOK 5 HOURS
     if (type.includes("text/vtt")) {
       console.log("VTT file found");
-      responseBody = (await fetchedRespone.text()) as string;
+      responseBody = (await fetchedResponse.text()) as string;
 
       const regex = /.+?\.(jpg)+/g;
       const matches = [...responseBody.matchAll(regex)];
@@ -41,20 +46,69 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
           const newUrl = url.replace(/\/[^\/]*$/, `/${filename}`);
           responseBody = responseBody.replaceAll(
             filename,
-            "https://goodproxy.zephex0-f6c.workers.dev/fetch?url=" + newUrl
+            "/fetch?url=" + newUrl
           );
         }
       }
-    } else {
-      console.log(type);
-      responseBody = fetchedRespone.body;
+    } else if (
+      type.includes("application/vnd.apple.mpegurl") ||
+      type.includes("video/MP2T") ||
+      type.includes("text/html")
+    ) {
+      responseBody = (await fetchedResponse.text()) as string;
+      if (!responseBody.startsWith("#EXTM3U")) {
+        console.log("error logger");
+        return new Response(responseBody, {
+          headers: corsHeaders,
+          status: fetchedResponse.status,
+          statusText: fetchedResponse.statusText,
+        });
+      }
+      console.log("HLS stream found");
+
+      // Regular expression to match the last segment of the URL
+      const regex = /\/[^\/]*$/;
+      const urlRegex = /^(?:(?:(?:https?|ftp):)?\/\/)[^\s/$.?#].[^\s]*$/i;
+      const m3u8FileChunks = responseBody.split("\n");
+      const m3u8AdjustedChunks = [];
+
+      for (const line of m3u8FileChunks) {
+        if (line.startsWith("#") || !line.trim()) {
+          m3u8AdjustedChunks.push(line);
+          continue;
+        }
+
+        let formattedLine = line;
+        if (line.startsWith(".")) {
+          formattedLine = line.substring(1); // Remove the leading dot
+        }
+
+        if (formattedLine.match(urlRegex)) {
+          console.log("TS or M3U8 files with URLs found, adding proxy path");
+          m3u8AdjustedChunks.push(
+            `/fetch?url=${encodeURIComponent(formattedLine)}`
+          );
+        } else {
+          const newUrls = url.replace(
+            regex,
+            formattedLine.startsWith("/") ? formattedLine : `/${formattedLine}`
+          );
+          console.log(
+            "TS or M3U8 files with no URLs found, adding path and proxy path."
+          );
+          m3u8AdjustedChunks.push(`/fetch?url=${encodeURIComponent(newUrls)}`);
+        }
+        // Update URL according to your needs
+      }
+      responseBody = m3u8AdjustedChunks.join("\n");
     }
+
     corsHeaders["Content-Type"] = type;
 
     return new Response(responseBody, {
       headers: corsHeaders,
-      status: fetchedRespone.status,
-      statusText: fetchedRespone.statusText,
+      status: fetchedResponse.status,
+      statusText: fetchedResponse.statusText,
     });
   } catch (error: any) {
     console.error(error);
@@ -68,5 +122,13 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
         },
       }
     );
+  }
+}
+
+export function getUrl(input: string, fallbackUrl: string): URL {
+  try {
+    return new URL(input);
+  } catch (e) {
+    return new URL(input, fallbackUrl);
   }
 }
