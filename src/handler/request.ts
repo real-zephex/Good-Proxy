@@ -51,7 +51,7 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
       }
     } else if (
       type.includes("application/vnd.apple.mpegurl") ||
-      type.includes("application/x-mpegURL") ||
+      type.includes("application/x-mpegurl") ||
       type.includes("video/MP2T") ||
       type.includes("audio/mpegurl") ||
       type.includes("text/html")
