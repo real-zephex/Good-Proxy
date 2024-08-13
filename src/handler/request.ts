@@ -12,7 +12,6 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
     const { url, ref } = response.query();
     const userHeaders = response.header();
 
-    const urlified = new URL(url);
     console.log(url);
 
     // fetching content from the remote server using the headers provided by the user
@@ -52,8 +51,11 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
       }
     } else if (
       type.includes("application/vnd.apple.mpegurl") ||
+      type.includes("application/x-mpegurl") ||
       type.includes("video/MP2T") ||
+      type.includes("audio/mpegurl") ||
       type.includes("text/html")
+      // including mp2t shouldn't be necessary but then there are some loose cases which report mp2t for m3u8 streams as well
     ) {
       responseBody = (await fetchedResponse.text()) as string;
       if (!responseBody.startsWith("#EXTM3U")) {
