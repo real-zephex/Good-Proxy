@@ -19,8 +19,9 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
       headers: { ...userHeaders, ...corsHeaders, Referer: ref ? ref : "" },
     }); // making request
 
-    const type = fetchedResponse.headers.get("Content-Type") || "text/plain"; // detecting type of the response
-    let responseBody: BodyInit | null = fetchedResponse.body;
+    let type = fetchedResponse.headers.get("Content-Type") || "text/plain"; // detecting type of the response
+
+    let responseBody: ArrayBuffer | string | null = null;
     console.log(type);
 
     // THIS LITERALLY TOOK 5 HOURS
@@ -54,12 +55,14 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
       type.includes("application/x-mpegurl") ||
       type.includes("video/MP2T") ||
       type.includes("audio/mpegurl") ||
-      type.includes("text/html")
+      type.includes("application/x-mpegURL") ||
+      type.includes("audio/x-mpegurl") ||
+      (type.includes("text/html") &&
+        (url.endsWith(".m3u8") || url.endsWith(".ts")))
       // including mp2t shouldn't be necessary but then there are some loose cases which report mp2t for m3u8 streams as well
     ) {
       responseBody = (await fetchedResponse.text()) as string;
       if (!responseBody.startsWith("#EXTM3U")) {
-        console.log("error logger");
         return new Response(responseBody, {
           headers: corsHeaders,
           status: fetchedResponse.status,
@@ -103,6 +106,18 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
         // Update URL according to your needs
       }
       responseBody = m3u8AdjustedChunks.join("\n");
+    } else {
+      responseBody = await fetchedResponse.arrayBuffer();
+    }
+
+    if (responseBody instanceof ArrayBuffer) {
+      // Perform checks to determine if it's actually video data
+      const body = new Uint8Array(responseBody);
+      if (body.length > 0 && body[0] === 0x47) {
+        // Simple TS packet start check
+        console.log("disguised files found");
+        type = "video/mp2t";
+      }
     }
 
     corsHeaders["Content-Type"] = type;
