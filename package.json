@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240806.0",
+    "bun-vercel": "^1.0.0-alpha.4",
     "wrangler": "^3.57.2"
   }
 }
