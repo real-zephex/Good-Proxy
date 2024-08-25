@@ -2,6 +2,7 @@
   "name": "goodproxy",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
+"build": "bun-vercel src/index.ts,
     "deploy": "wrangler deploy --minify src/index.ts"
   },
   "dependencies": {
