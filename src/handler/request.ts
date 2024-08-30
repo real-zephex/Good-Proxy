@@ -12,6 +12,8 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
     const { url, ref } = response.query();
     const userHeaders = response.header();
 
+    let refString = ref ? "&ref=" + encodeURIComponent(ref) : "";
+
     console.log(url);
 
     // fetching content from the remote server using the headers provided by the user
@@ -46,7 +48,7 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
           const newUrl = url.replace(/\/[^\/]*$/, `/${filename}`);
           responseBody = responseBody.replaceAll(
             filename,
-            "/fetch?url=" + newUrl
+            "/fetch?url=" + newUrl + refString
           );
         }
       }
@@ -91,7 +93,7 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
         if (formattedLine.match(urlRegex)) {
           console.log("TS or M3U8 files with URLs found, adding proxy path");
           m3u8AdjustedChunks.push(
-            `/fetch?url=${encodeURIComponent(formattedLine)}`
+            `/fetch?url=${encodeURIComponent(formattedLine)}${refString}`
           );
         } else {
           const newUrls = url.replace(
@@ -101,7 +103,9 @@ export async function RequestHandler({ response }: { response: HonoRequest }) {
           console.log(
             "TS or M3U8 files with no URLs found, adding path and proxy path."
           );
-          m3u8AdjustedChunks.push(`/fetch?url=${encodeURIComponent(newUrls)}`);
+          m3u8AdjustedChunks.push(
+            `/fetch?url=${encodeURIComponent(newUrls)}${refString}`
+          );
         }
         // Update URL according to your needs
       }
