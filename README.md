@@ -34,6 +34,30 @@ To get started with GoodProxy, follow these steps:
 
     The server will be available at `http://localhost:8787`.
 
+### Deploy on Cloudflare's Workers
+
+1. **Clone the Repository**:
+
+    ```bash
+    git clone https://github.com/yourusername/goodproxy.git
+    cd goodproxy
+    ```
+
+2. **Install Dependencies**:
+
+    ```bash
+    bun install
+    ```
+
+3. **Deploy the Worker**:
+
+    ```bash
+    bun run deploy
+    ```
+
+    Your default browser will open, log in your Cloudflare account and click authorize and done your worker will be deployed. 
+    You can then add your custom domain and view insights.
+
 ## Usage
 
 ### Endpoints
