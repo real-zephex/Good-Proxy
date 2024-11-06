@@ -11,8 +11,5 @@
   ],
   "env": {
     "BUN_BIN": "bun"
-  },
-  "start": {
-    "command": "bun run dev"
   }
 }
