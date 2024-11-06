@@ -78,19 +78,7 @@ For development, you can use the following commands:
 - **Run in Development Mode**:
 
     ```bash
-    npm run dev
-    ```
-
-- **Build the Project**:
-
-    ```bash
-    npm run build
-    ```
-
-- **Run Tests**:
-
-    ```bash
-    npm test
+    bun run dev
     ```
 
 ## License
