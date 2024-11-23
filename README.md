@@ -16,7 +16,7 @@ To get started with GoodProxy, follow these steps:
 1. **Clone the Repository**:
 
     ```bash
-    git clone https://github.com/yourusername/goodproxy.git
+    git clone https://github.com/real-zephex/Good-Proxy.git
     cd goodproxy
     ```
 
@@ -39,7 +39,7 @@ To get started with GoodProxy, follow these steps:
 1. **Clone the Repository**:
 
     ```bash
-    git clone https://github.com/yourusername/goodproxy.git
+    git clone https://github.com/real-zephex/Good-Proxy.git
     cd goodproxy
     ```
 
@@ -55,7 +55,7 @@ To get started with GoodProxy, follow these steps:
     bun run deploy
     ```
 
-    Your default browser will open, log in your Cloudflare account and click authorize and done your worker will be deployed. 
+    Your default browser will open, log in your Cloudflare account and click authorize and your worker will be deployed. 
     You can then add your custom domain and view insights.
 
 ## Usage
