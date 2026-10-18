@@ -1,6 +1,6 @@
-const DEFAULT_PROXY_BASE = "https://goodproxy.zephex0-f6c.workers.dev/fetch?url=";
+const DEFAULT_PROXY_ORIGIN = "https://goodproxy.zephex0-f6c.workers.dev";
 
-const baseEl = document.getElementById("base");
+const originEl = document.getElementById("origin");
 const statusEl = document.getElementById("status");
 
 function flash(message) {
@@ -8,24 +8,31 @@ function flash(message) {
   setTimeout(() => (statusEl.textContent = ""), 1500);
 }
 
+function normalize(value) {
+  return value.trim().replace(/\/+$/, "");
+}
+
 async function load() {
-  const { proxyBase } = await chrome.storage.sync.get("proxyBase");
-  baseEl.value = proxyBase || DEFAULT_PROXY_BASE;
+  const { proxyOrigin } = await chrome.storage.sync.get("proxyOrigin");
+  originEl.value = proxyOrigin || DEFAULT_PROXY_ORIGIN;
 }
 
 document.getElementById("save").addEventListener("click", async () => {
-  const value = baseEl.value.trim();
-  if (!value.includes("url=")) {
-    flash("Must contain \"url=\"");
+  const value = normalize(originEl.value);
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") throw 0;
+  } catch {
+    flash("Enter a valid http(s) origin");
     return;
   }
-  await chrome.storage.sync.set({ proxyBase: value });
+  await chrome.storage.sync.set({ proxyOrigin: value });
   flash("Saved");
 });
 
 document.getElementById("reset").addEventListener("click", async () => {
-  await chrome.storage.sync.set({ proxyBase: DEFAULT_PROXY_BASE });
-  baseEl.value = DEFAULT_PROXY_BASE;
+  await chrome.storage.sync.set({ proxyOrigin: DEFAULT_PROXY_ORIGIN });
+  originEl.value = DEFAULT_PROXY_ORIGIN;
   flash("Reset");
 });
 

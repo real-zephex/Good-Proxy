@@ -6,8 +6,14 @@ GoodProxy is a lightweight proxy server built with Hono that facilitates fetchin
 ## Features
 
 - **CORS Support**: Allows cross-origin requests with customizable headers.
-- **Content Handling**: Supports fetching and transforming VTT files, HLS streams, and more.
+- **Content Handling**: Rewrites HTML, CSS, WebVTT, HLS playlists (and HLS tag `URI="..."` attributes) so links, assets and streams keep flowing through the proxy.
 - **Dynamic URL Replacement**: Automatically updates URLs in fetched content to proxy paths.
+- **Streaming & Range Requests**: Bodies are streamed rather than buffered, and `Range`/`Content-Range`/`Accept-Ranges` are passed through, so media seeking works.
+- **Per-site isolation**: `/p/<host>/fetch` scopes the origin's cookies to that prefix, so sites proxied side by side do not share a session.
+- **Working logins**: Cookies (`Set-Cookie`, re-pathed and `Domain`-stripped), redirects (`Location` rewritten), request bodies and `Origin`/`Referer` are forwarded, so POST logins and cookie-authenticated requests work.
+- **WebSocket passthrough**: `Upgrade: websocket` requests are tunnelled to the origin.
+- **Runtime shim**: Proxied HTML documents get a small script that re-routes runtime URLs (`fetch`, `XMLHttpRequest`, `Worker`, `EventSource`, `WebSocket`, element `src`/`setAttribute`, `history`).
+- **Edge caching**: Static, cookie-less assets (CSS, JS, images, fonts) are cached with the Cache API, honouring upstream `Cache-Control`.
 
 ## Installation
 
@@ -62,8 +68,12 @@ To get started with GoodProxy, follow these steps:
 
 ### Endpoints
 
-- **GET /**: Returns a simple "Hello Hono!" message.
-- **GET /fetch**: Proxy endpoint that fetches content from a remote server based on the `url` query parameter. Additonally, you can also pass referers using `ref` parameter.
+- **GET /**: The gateway page — paste a URL and browse it through the proxy.
+- **GET /go?url=**: Redirects to the correct per-site proxy URL (used by the gateway form).
+- **GET|POST|PUT|DELETE|OPTIONS /fetch?url=**: Proxy endpoint that fetches content from a remote server based on the `url` query parameter. Additionally, you can also pass referers using the `ref` parameter. Every method is forwarded, along with the request body.
+- **GET|POST|PUT|DELETE|OPTIONS /p/&lt;host&gt;/fetch?url=**: Same as `/fetch`, but scopes the origin's cookies to `/p/<host>/`. Prefer this form; the gateway page and the browser extension use it automatically.
+
+Any http(s) URL can be proxied; with `Upgrade: websocket` the `url` may also be `ws:`/`wss:`.
 
 ### Example Request
 
@@ -104,6 +114,29 @@ For development, you can use the following commands:
     ```bash
     bun run dev
     ```
+
+- **Typecheck**:
+
+    ```bash
+    bun run typecheck
+    ```
+
+- **Run the tests** (`vitest` running inside workerd):
+
+    ```bash
+    bun run test
+    ```
+
+### Configuration
+
+Optional Worker vars (see `wrangler.toml`):
+
+- `PROXY_URL`: public URL of this deployment, shown on the gateway page. Falls back to the request origin.
+- `DEBUG`: set to `"true"` to enable request logging.
+
+### Browser extension
+
+A minimal Chrome/Edge (MV3) extension lives in [`extension/`](extension/README.md); it routes every top-level navigation through a GoodProxy instance.
 
 ## License
 

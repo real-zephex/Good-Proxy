@@ -2,14 +2,22 @@
   "name": "goodproxy",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
-    "deploy": "wrangler deploy --minify src/index.ts"
+    "deploy": "wrangler deploy --minify src/index.ts",
+    "build": "wrangler deploy --dry-run",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@types/node": "^22.20.5",
     "hono": "^4.13.13"
   },
   "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.4.4",
     "@cloudflare/workers-types": "^4.20260702.1",
+    "@vitest/runner": "^4",
+    "@vitest/snapshot": "^4",
+    "typescript": "^7.0.2",
+    "vitest": "^4",
     "wrangler": "4"
   }
 }

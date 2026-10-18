@@ -1,13 +1,13 @@
-const DEFAULT_PROXY_BASE = "https://goodproxy.zephex0-f6c.workers.dev/fetch?url=";
+const DEFAULT_PROXY_ORIGIN = "https://goodproxy.zephex0-f6c.workers.dev";
 
 const enabledEl = document.getElementById("enabled");
 const targetEl = document.getElementById("target");
 
 async function refresh() {
-  const { proxyBase = DEFAULT_PROXY_BASE, enabled = true } =
-    await chrome.storage.sync.get(["proxyBase", "enabled"]);
+  const { proxyOrigin = DEFAULT_PROXY_ORIGIN, enabled = true } =
+    await chrome.storage.sync.get(["proxyOrigin", "enabled"]);
   enabledEl.checked = enabled;
-  targetEl.textContent = proxyBase;
+  targetEl.textContent = proxyOrigin;
 }
 
 enabledEl.addEventListener("change", () => {
