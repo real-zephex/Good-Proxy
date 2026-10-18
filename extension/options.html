@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        font: 13px/1.4 system-ui, sans-serif;
+        padding: 16px;
+        max-width: 520px;
+      }
+      label {
+        display: block;
+        margin-bottom: 6px;
+      }
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        font: inherit;
+        padding: 6px;
+        margin-bottom: 12px;
+      }
+      button {
+        font: inherit;
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+      #status {
+        color: #197a3d;
+        margin-left: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <label for="base">Proxy base URL</label>
+    <input id="base" type="url" spellcheck="false" />
+    <button id="save">Save</button>
+    <button id="reset">Reset to default</button>
+    <span id="status"></span>
+    <script src="options.js"></script>
+  </body>
+</html>

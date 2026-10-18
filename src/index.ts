@@ -13,7 +13,9 @@ app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
-app.get("/fetch", async (c) => {
+// Accept every method so form submissions and API calls (POST/PUT/...)
+// can be forwarded upstream, not just GET navigations.
+app.all("/fetch", async (c) => {
   const data = await RequestHandler({ response: c.req });
   return data;
 });

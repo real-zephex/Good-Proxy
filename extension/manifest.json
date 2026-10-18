@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "GoodProxy",
+  "version": "1.0.0",
+  "description": "Browse through a GoodProxy instance: every page you open is routed through the proxy.",
+  "permissions": ["webNavigation", "tabs", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "GoodProxy",
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  }
+}
